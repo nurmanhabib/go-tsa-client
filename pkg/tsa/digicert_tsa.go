@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/nurmanhabib/go-tsa-client/domain/entity"
 )
 
 type DigiCertClient struct {
@@ -16,7 +18,7 @@ func NewDigiCertClient() *DigiCertClient {
 	}
 }
 
-func (c *DigiCertClient) TSARequest(tsq []byte) (tsr []byte, err error) {
+func (c *DigiCertClient) TSARequest(tsq []byte) (reply *entity.TSReply, err error) {
 	url := "http://timestamp.digicert.com"
 	method := "POST"
 
@@ -38,9 +40,15 @@ func (c *DigiCertClient) TSARequest(tsq []byte) (tsr []byte, err error) {
 
 	defer res.Body.Close()
 
-	tsr, err = ioutil.ReadAll(res.Body)
+	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	tsr := &entity.TSReply{
+		Data:          data,
+		ContentLength: res.ContentLength,
+		Date:          res.Header.Get("Date"),
 	}
 
 	return tsr, nil

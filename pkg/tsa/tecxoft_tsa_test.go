@@ -7,29 +7,29 @@ import (
 	"path"
 	"testing"
 
-	"github.com/nurmanhabib/go-tsa-client/generate"
-	"github.com/nurmanhabib/go-tsa-client/tsa"
-
+	generate2 "github.com/nurmanhabib/go-tsa-client/pkg/generate"
+	"github.com/nurmanhabib/go-tsa-client/pkg/tsa"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDigiCertClient_TSARequest(t *testing.T) {
-	input := path.Join("..", "tests/output", "file.txt")
-	outputTSQ := path.Join("..", "tests/output", "file.tsq")
-	outputTSR := path.Join("..", "tests/output", "file.tsr")
+func TestTecxoftTSA_TSARequest(t *testing.T) {
+	input := path.Join("../..", "tests/output", "file.txt")
+	outputTSQ := path.Join("../..", "tests/output", "file.tsq")
+	outputTSR := path.Join("../..", "tests/output", "file.tsr")
 
 	data := []byte("Hello world")
 	err := os.WriteFile(input, data, 0644)
 	require.NoError(t, err)
 
-	errTSR := generate.TimestampQuery(input, outputTSQ)
+	errTSR := generate2.TimestampQuery(input, outputTSQ)
 	require.NoError(t, errTSR)
 
 	tsq, errTSQ := os.ReadFile(outputTSQ)
 	require.NoError(t, errTSQ)
 
-	client := tsa.NewDigiCertClient()
+	// Use Tecxoft TSA
+	client := tsa.NewTecxoftTSA("51245", "9D485JYf")
 	response, errReq := client.TSARequest(tsq)
 	require.NoError(t, errReq)
 
@@ -38,10 +38,10 @@ func TestDigiCertClient_TSARequest(t *testing.T) {
 
 	defer f.Close()
 
-	_, errW := f.Write(response)
+	_, errW := f.Write(response.Data)
 	require.NoError(t, errW)
 
-	verify, err := generate.TSRVerify(outputTSR)
+	verify, err := generate2.TSRVerify(outputTSR)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, verify)

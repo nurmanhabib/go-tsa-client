@@ -5,7 +5,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/nurmanhabib/go-tsa-client/generate"
+	"github.com/nurmanhabib/go-tsa-client/pkg/generate"
 
 	"github.com/stretchr/testify/require"
 )
